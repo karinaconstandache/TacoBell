@@ -30,7 +30,7 @@
             </StackPanel>
 
             <!-- Centered Logo -->
-            <Image Grid.Column="1" Source="/Images/logo.png" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Image Grid.Column="1" Source="/Assets/Images/logo.png" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
             <!-- App Menu Icon Button -->
             <Button Grid.Column="2" Command="{Binding OpenAppMenuCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand"
@@ -44,13 +44,14 @@
         </Grid>
 
         <!-- App Menu -->
-        <Border Background="#2E0854" Height="180" HorizontalAlignment ="Right" VerticalAlignment="Top" Margin="0,80,0,0"
+        <Border Background="#CC2E0854" CornerRadius="0,0,12,12" Padding="5" Height="220" HorizontalAlignment ="Right" VerticalAlignment="Top" Margin="0,80,20,0"
                 Visibility="{Binding IsAppMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                 Panel.ZIndex="1">
+            
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="40">
-                <Button Content="Home" Command="{Binding NavigateToHomeCommand}" Style="{StaticResource HoverTextButtonStyle}" Margin="7"/>
-                <Button Content="Menu" Command="{Binding NavigateToMenuCommand}" Style="{StaticResource HoverTextButtonStyle}" Margin="7"/>
-                <Button Content="Account" Command="{Binding NavigateToAccountCommand}" Style="{StaticResource HoverTextButtonStyle}" Margin="7"/>
+                <Button Content="HOME" Command="{Binding NavigateToHomeCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="MENIU" Command="{Binding NavigateToMenuCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="ACCOUNT" Command="{Binding NavigateToAccountCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
             </StackPanel>
         </Border>
 
@@ -75,7 +76,7 @@
                         <!-- Ad Image -->
                         <Border Grid.Column="1" MaxHeight="300" HorizontalAlignment="Stretch">
                             <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
-                                <Image Source="/Images/tacotuesday.png"
+                                <Image Source="/Assets/Images/tacotuesday.png"
                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"/>
                             </Viewbox>
                         </Border>
@@ -91,7 +92,7 @@
                     <!-- Card 1 -->
                     <Border Width="300" Background="#B2DFDB" Margin="10" CornerRadius="12">
                         <StackPanel>
-                            <Image Source="/Images/menuimage.jpg" Height="180" Stretch="UniformToFill"/>
+                            <Image Source="/Assets/Images/menuimage.jpg" Height="180" Stretch="UniformToFill"/>
                             <TextBlock Text="MENIUL NOSTRU" FontWeight="Bold" FontSize="20"
                                        HorizontalAlignment="Center" Foreground="#4A148C" Margin="10"/>
                             <TextBlock TextWrapping="Wrap" FontSize="12" Margin="10"
@@ -104,7 +105,7 @@
                     <!-- Card 2 -->
                     <Border Width="300" Background="#B2DFDB" Margin="10" CornerRadius="12">
                         <StackPanel>
-                            <Image Source="/Images/locations.png" Height="180" Stretch="UniformToFill"/>
+                            <Image Source="/Assets/Images/locations.png" Height="180" Stretch="UniformToFill"/>
                             <TextBlock Text="RESTAURANTE" FontWeight="Bold" FontSize="20"
                                        HorizontalAlignment="Center" Foreground="#4A148C" Margin="10"/>
                             <TextBlock TextWrapping="Wrap" FontSize="12" Margin="10"

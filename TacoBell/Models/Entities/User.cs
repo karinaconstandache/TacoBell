@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using TacoBell.Models.Enums;
 
 namespace TacoBell.Models.Entities
 {
@@ -13,8 +14,7 @@ namespace TacoBell.Models.Entities
         public string PhoneNumber { get; set; }
         public string DeliveryAddress { get; set; }
         public string Password { get; set; }
-        public string Role { get; set; }
-
+        public UserRole Role { get; set; } = UserRole.USER;
         public ICollection<Order> Orders { get; set; }
     }
 }

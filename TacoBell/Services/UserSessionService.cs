@@ -4,8 +4,18 @@ namespace TacoBell.Services
 {
     public class UserSessionService
     {
+        public User CurrentUser { get; private set; }
+
         public bool IsUserLoggedIn => CurrentUser != null;
-        public User CurrentUser { get; set; }
+
+        public void SetUser(User user)
+        {
+            CurrentUser = user;
+        }
+
+        public void Logout()
+        {
+            CurrentUser = null;
+        }
     }
 }
-

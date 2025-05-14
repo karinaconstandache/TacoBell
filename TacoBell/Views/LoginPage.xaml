@@ -12,6 +12,9 @@
 
     <Window.Resources>
         <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <helpers:BoolToTextConverter x:Key="BoolToTextConverter"/>
+        <helpers:SwitchModeTextConverter x:Key="SwitchModeTextConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -58,11 +61,76 @@
         </Border>
 
         <!-- Scrollable Content (Main) -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0" Panel.ZIndex="0">
-            <StackPanel>
-                <!-- Future menu content goes here -->
-                <TextBlock Text="Here comes the login form..." Foreground="White" FontSize="24" Margin="20"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Width="500" Margin="0,20">
+
+                <!-- FORM TITLE -->
+                <TextBlock Text="{Binding IsLoginMode, Converter={StaticResource BoolToTextConverter}}"
+                   FontSize="24" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                <!-- FORM FIELDS -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- EMAIL -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Email:" Foreground="White" VerticalAlignment="Center" Margin="0,5"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Email}" Margin="0,5"/>
+
+                    <!-- PASSWORD -->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" Foreground="White" VerticalAlignment="Center" Margin="0,5"/>
+                    <PasswordBox x:Name="PasswordBox" Grid.Row="1" Grid.Column="1" Margin="0,5" PasswordChanged="PasswordBox_PasswordChanged"/>
+
+                    <!-- REGISTER-ONLY FIELDS -->
+                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Visibility="{Binding IsLoginMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="First Name:" Foreground="White" VerticalAlignment="Center" Margin="0,5"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FirstName}" Margin="0,5"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Last Name:" Foreground="White" VerticalAlignment="Center" Margin="0,5"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastName}" Margin="0,5"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Phone Number:" Foreground="White" VerticalAlignment="Center" Margin="0,5"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding PhoneNumber}" Margin="0,5"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Address:" Foreground="White" VerticalAlignment="Center" Margin="0,5"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding DeliveryAddress}" Margin="0,5"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ERROR MESSAGE -->
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Margin="0,10" HorizontalAlignment="Center"/>
+
+                <!-- SUBMIT & SWITCH -->
+                <Button Content="Submit" Command="{Binding SubmitCommand}" Margin="0,5" Width="120" HorizontalAlignment="Center"/>
+                <Button Content="{Binding IsLoginMode, Converter={StaticResource SwitchModeTextConverter}}"
+                Command="{Binding SwitchToRegisterCommand}" Margin="0,5" Width="200" HorizontalAlignment="Center"/>
+
             </StackPanel>
         </ScrollViewer>
+
+
     </Grid>
 </Window>

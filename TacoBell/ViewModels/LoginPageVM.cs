@@ -10,13 +10,11 @@ namespace TacoBell.ViewModels
     public class LoginPageVM : BaseViewModel
     {
         private readonly NavigationService _navigationService;
-        private readonly UserSessionService _userSessionService;
         private readonly UserBLL _userBLL = new();
 
-        public LoginPageVM(NavigationService navigationService, UserSessionService userSessionService)
+        public LoginPageVM(NavigationService navigationService)
         {
             _navigationService = navigationService;
-            _userSessionService = userSessionService;
 
             NavigateToLoginCommand = new RelayCommand(_ => SwitchMode(true));
             OpenAppMenuCommand = new RelayCommand(_ => IsAppMenuVisible = !IsAppMenuVisible);
@@ -72,7 +70,7 @@ namespace TacoBell.ViewModels
 
         private void NavigateToAccount()
         {
-            if (_userSessionService.IsUserLoggedIn)
+            if (UserSessionService.IsUserLoggedIn)
                 _navigationService.NavigateTo("AccountPage");
             else
                 _navigationService.NavigateTo("LoginPage");
@@ -97,7 +95,7 @@ namespace TacoBell.ViewModels
                     return;
                 }
 
-                _userSessionService.SetUser(user);
+                UserSessionService.SetUser(user);
                 _navigationService.NavigateTo("HomePage");
             }
             else
@@ -129,7 +127,7 @@ namespace TacoBell.ViewModels
                 };
 
                 _userBLL.Register(user);
-                _userSessionService.SetUser(user);
+                UserSessionService.SetUser(user);
                 _navigationService.NavigateTo("HomePage");
             }
         }

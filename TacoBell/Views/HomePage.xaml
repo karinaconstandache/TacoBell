@@ -8,6 +8,9 @@
 
     <Window.Resources>
         <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <helpers:BoolToTextConverter x:Key="BoolToTextConverter"/>
+        <helpers:SwitchModeTextConverter x:Key="SwitchModeTextConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -23,10 +26,23 @@
             <!-- Left Side: User Icon + Login Text -->
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
                 <Ellipse Width="40" Height="40" Fill="White" VerticalAlignment="Center"/>
+                
+                <!-- Show user's name when logged in -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                    Visibility="{Binding IsUserLoggedIn, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="{Binding CurrentUserName}" Foreground="White" FontSize="16" VerticalAlignment="Center" Margin="5"/>
+                    <Button Content="Logout"
+                    Command="{Binding LogoutCommand}"
+                    Background="Transparent" Foreground="White" BorderThickness="0" Margin="10,0,0,0"/>
+                </StackPanel>
+
+                <!-- Show login button when not logged in -->
                 <Button Content="Login / Sign up"
-                        Style="{StaticResource HoverTextButtonStyle}"
-                        Command="{Binding NavigateToLoginCommand}"
-                        VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    Style="{StaticResource HoverTextButtonStyle}"
+                    Command="{Binding NavigateToLoginCommand}"
+                    VerticalAlignment="Center" Margin="10,0,0,0"
+                    Visibility="{Binding IsUserLoggedIn, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
             </StackPanel>
 
             <!-- Centered Logo -->

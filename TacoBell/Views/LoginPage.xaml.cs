@@ -12,17 +12,14 @@ namespace TacoBell.Views
         public LoginPage()
         {
             InitializeComponent();
-            _viewModel = new LoginPageVM(new NavigationService(), new UserSessionService());
+            _viewModel = new LoginPageVM(new NavigationService());
             DataContext = _viewModel;
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (sender is PasswordBox pb)
-            {
                 _viewModel.Password = pb.Password;
-            }
         }
     }
-
 }

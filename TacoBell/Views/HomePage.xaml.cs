@@ -9,7 +9,7 @@ namespace TacoBell.Views
         public HomePage()
         {
             InitializeComponent();
-            DataContext = new HomePageVM(new NavigationService(), new UserSessionService());
+            DataContext = new HomePageVM(new NavigationService());
         }
     }
 }

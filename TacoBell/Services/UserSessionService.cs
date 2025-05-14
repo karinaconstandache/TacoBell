@@ -2,18 +2,18 @@
 
 namespace TacoBell.Services
 {
-    public class UserSessionService
+    public static class UserSessionService
     {
-        public User CurrentUser { get; private set; }
+        public static User? CurrentUser { get; private set; }
 
-        public bool IsUserLoggedIn => CurrentUser != null;
+        public static bool IsUserLoggedIn => CurrentUser != null;
 
-        public void SetUser(User user)
+        public static void SetUser(User user)
         {
             CurrentUser = user;
         }
 
-        public void Logout()
+        public static void Logout()
         {
             CurrentUser = null;
         }

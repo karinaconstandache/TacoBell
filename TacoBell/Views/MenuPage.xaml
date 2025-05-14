@@ -3,15 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TacoBell.Views"
         mc:Ignorable="d"
+        xmlns:helpers="clr-namespace:TacoBell.Helpers"
         Title="MenuPage" Height="600" Width="900"
         WindowStartupLocation="CenterScreen"
         Background="#5C2D73">
+
+    <Window.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+
     <Grid>
         <!-- Top Black Bar -->
-        <Grid Background="Black" Height="80" VerticalAlignment="Top">
-            <!-- Base columns -->
+        <Grid Background="Black" Height="80" VerticalAlignment="Top" Panel.ZIndex="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -21,18 +25,43 @@
             <!-- Left Side: User Icon + Login Text -->
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
                 <Ellipse Width="40" Height="40" Fill="White" VerticalAlignment="Center"/>
-                <TextBlock Text="Login / Sign up" Foreground="White" FontSize="16" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                <Button Content="Login / Sign up"
+                        Style="{StaticResource HoverTextButtonStyle}"
+                        Command="{Binding NavigateToLoginCommand}"
+                        VerticalAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
 
             <!-- Centered Logo -->
-            <Image Grid.Column="1" Source="/Images/logo.png" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Image Grid.Column="1" Source="/Assets/Images/logo.png" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
-            <!-- Menu Icon (Three lines) -->
-            <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Cursor="Hand">
-                <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
-                <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
-                <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
-            </StackPanel>
+            <!-- App Menu Icon Button -->
+            <Button Grid.Column="2" Command="{Binding OpenAppMenuCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Padding="0">
+                <StackPanel Orientation="Vertical">
+                    <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
+                    <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
+                    <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
+                </StackPanel>
+            </Button>
         </Grid>
+
+        <!-- App Menu -->
+        <Border Background="#CC2E0854" CornerRadius="0,0,12,12" Padding="5" Height="220" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,80,20,0"
+                Visibility="{Binding IsAppMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                Panel.ZIndex="2">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="40">
+                <Button Content="HOME" Command="{Binding NavigateToHomeCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="MENU" Command="{Binding NavigateToMenuCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="ACCOUNT" Command="{Binding NavigateToAccountCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Scrollable Content (Main) -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0" Panel.ZIndex="0">
+            <StackPanel>
+                <!-- Future menu content goes here -->
+                <TextBlock Text="Here comes the menu content..." Foreground="White" FontSize="24" Margin="20"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

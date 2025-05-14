@@ -50,7 +50,7 @@
             
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="40">
                 <Button Content="HOME" Command="{Binding NavigateToHomeCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
-                <Button Content="MENIU" Command="{Binding NavigateToMenuCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="MENU" Command="{Binding NavigateToMenuCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
                 <Button Content="ACCOUNT" Command="{Binding NavigateToAccountCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
             </StackPanel>
         </Border>

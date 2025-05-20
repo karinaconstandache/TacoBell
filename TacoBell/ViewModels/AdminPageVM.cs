@@ -1,4 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using TacoBell.Helpers;
 using TacoBell.Models.BusinessLogicLayer;
@@ -41,11 +45,14 @@ namespace TacoBell.ViewModels
             LoadMenus();
             LoadCategories();
             LoadAllergens();
+            LoadAvailableImages();
 
             NewDish = new Dish();
             NewMenu = new Menu();
             NewCategory = new Category();
             NewAllergen = new Allergen();
+
+            AvailableAllergens = new ObservableCollection<Allergen>(_allergenBLL.GetAllAllergens());
         }
 
         public string CurrentUserName => UserSessionService.CurrentUser?.FirstName ?? "";
@@ -112,6 +119,9 @@ namespace TacoBell.ViewModels
         public ObservableCollection<Menu> MenuList { get; set; } = new();
         public ObservableCollection<Category> CategoryList { get; set; } = new();
         public ObservableCollection<Allergen> AllergenList { get; set; } = new();
+        public ObservableCollection<Allergen> AvailableAllergens { get; set; } = new();
+        public List<string> AvailableImages { get; set; }
+        public string SelectedImagePath { get; set; }
 
         public ICommand EditDishCommand => new RelayCommand(d => { });
         public ICommand DeleteDishCommand => new RelayCommand(d => { });
@@ -122,7 +132,6 @@ namespace TacoBell.ViewModels
         public ICommand EditAllergenCommand => new RelayCommand(a => { });
         public ICommand DeleteAllergenCommand => new RelayCommand(a => { });
 
-        // New dish creation
         public Dish NewDish { get; set; }
         public Category SelectedCategoryForNewDish { get; set; }
         public ICommand AddDishCommand => new RelayCommand(_ => AddDish());
@@ -135,15 +144,34 @@ namespace TacoBell.ViewModels
             {
                 NewDish.CategoryId = SelectedCategoryForNewDish.CategoryId;
                 _dishBLL.AddDish(NewDish);
+
+                if (!string.IsNullOrWhiteSpace(SelectedImagePath))
+                {
+                    _dishBLL.AddDishImage(NewDish.DishId, SelectedImagePath);
+                }
+
+                var selectedAllergenIds = AvailableAllergens
+                    .Where(a => a.IsSelected)
+                    .Select(a => a.AllergenId).ToList();
+
+                if (selectedAllergenIds.Count > 0)
+                {
+                    _dishBLL.AddDishAllergens(NewDish.DishId, selectedAllergenIds);
+                }
+
                 NewDish = new Dish();
                 SelectedCategoryForNewDish = null;
+                SelectedImagePath = null;
+                foreach (var allergen in AvailableAllergens)
+                    allergen.IsSelected = false;
+
                 OnPropertyChanged(nameof(NewDish));
                 OnPropertyChanged(nameof(SelectedCategoryForNewDish));
+                OnPropertyChanged(nameof(SelectedImagePath));
                 LoadDishes();
             }
         }
 
-        // Menus
         public Menu NewMenu { get; set; }
         public Category SelectedCategoryForNewMenu { get; set; }
         public ICommand AddMenuCommand => new RelayCommand(_ => AddMenu());
@@ -179,7 +207,6 @@ namespace TacoBell.ViewModels
             LoadMenus();
         }
 
-        // Category CRUD
         public Category NewCategory { get; set; }
         public ICommand AddCategoryCommand => new RelayCommand(_ => AddCategory());
 
@@ -194,7 +221,6 @@ namespace TacoBell.ViewModels
             }
         }
 
-        // Allergen CRUD
         public Allergen NewAllergen { get; set; }
         public ICommand AddAllergenCommand => new RelayCommand(_ => AddAllergen());
 
@@ -206,8 +232,10 @@ namespace TacoBell.ViewModels
                 NewAllergen = new Allergen();
                 OnPropertyChanged(nameof(NewAllergen));
                 LoadAllergens();
+                RefreshAvailableAllergens(); // <== aici
             }
         }
+
 
         private void LoadDishes()
         {
@@ -231,6 +259,31 @@ namespace TacoBell.ViewModels
         {
             AllergenList = new ObservableCollection<Allergen>(_allergenBLL.GetAllAllergens());
             OnPropertyChanged(nameof(AllergenList));
+        }
+
+        private void LoadAvailableImages()
+        {
+            var imageDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Images");
+            if (Directory.Exists(imageDir))
+            {
+                AvailableImages = Directory.GetFiles(imageDir)
+                    .Select(p => Path.Combine("Assets", "Images", Path.GetFileName(p))).ToList();
+            }
+            else
+            {
+                AvailableImages = new();
+            }
+            OnPropertyChanged(nameof(AvailableImages));
+        }
+
+        private void RefreshAvailableAllergens()
+        {
+            AvailableAllergens.Clear();
+            foreach (var allergen in _allergenBLL.GetAllAllergens())
+            {
+                AvailableAllergens.Add(allergen);
+            }
+            OnPropertyChanged(nameof(AvailableAllergens));
         }
 
         private void Logout()

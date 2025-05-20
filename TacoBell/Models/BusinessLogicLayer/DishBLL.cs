@@ -19,6 +19,35 @@ namespace TacoBell.Models.BusinessLogicLayer
             _db.SaveChanges();
         }
 
+        public void AddDishImage(int dishId, string relativeImagePath)
+        {
+            if (!string.IsNullOrWhiteSpace(relativeImagePath))
+            {
+                _db.DishImages.Add(new DishImage
+                {
+                    DishId = dishId,
+                    RelativePath = relativeImagePath
+                });
+                _db.SaveChanges();
+            }
+        }
+
+        public void AddDishAllergens(int dishId, List<int> allergenIds)
+        {
+            if (allergenIds != null && allergenIds.Count > 0)
+            {
+                foreach (int allergenId in allergenIds)
+                {
+                    _db.DishAllergens.Add(new DishAllergen
+                    {
+                        DishId = dishId,
+                        AllergenId = allergenId
+                    });
+                }
+                _db.SaveChanges();
+            }
+        }
+
         public void UpdateDish(Dish dish)
         {
             var existing = _db.Dishes.Find(dish.DishId);

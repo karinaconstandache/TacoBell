@@ -93,13 +93,31 @@
                         </DataGrid>
 
                         <!-- Add New Dish -->
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <TextBox Width="150" Margin="5" Text="{Binding NewDish.Name, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBox Width="100" Margin="5" Text="{Binding NewDish.Price, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBox Width="100" Margin="5" Text="{Binding NewDish.PortionSize, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBox Width="100" Margin="5" Text="{Binding NewDish.TotalQuantity, UpdateSourceTrigger=PropertyChanged}" />
-                            <ComboBox Width="150" Margin="5" ItemsSource="{Binding CategoryList}" SelectedItem="{Binding SelectedCategoryForNewDish, Mode=TwoWay}" DisplayMemberPath="Name" />
-                            <Button Content="+" Width="40" Command="{Binding AddDishCommand}" />
+                        <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBox Width="150" Margin="5" Text="{Binding NewDish.Name, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Width="100" Margin="5" Text="{Binding NewDish.Price, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Width="100" Margin="5" Text="{Binding NewDish.PortionSize, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Width="100" Margin="5" Text="{Binding NewDish.TotalQuantity, UpdateSourceTrigger=PropertyChanged}" />
+                                <ComboBox Width="150" Margin="5" ItemsSource="{Binding CategoryList}" SelectedItem="{Binding SelectedCategoryForNewDish, Mode=TwoWay}" DisplayMemberPath="Name" />
+                                <ComboBox Width="150" Margin="5" ItemsSource="{Binding AvailableImages}" SelectedItem="{Binding SelectedImagePath}" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <ItemsControl ItemsSource="{Binding AvailableAllergens}" Margin="5">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="5" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Button Content="+" Width="40" Margin="10,0,0,0" Command="{Binding AddDishCommand}" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

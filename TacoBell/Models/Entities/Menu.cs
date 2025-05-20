@@ -14,6 +14,9 @@ namespace TacoBell.Models.Entities
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 
+        [NotMapped]
+        public string CategoryName { get; set; }
+
         public ICollection<MenuDish> MenuDishes { get; set; }
         public ICollection<OrderMenu> OrderMenus { get; set; }
     }

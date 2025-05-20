@@ -12,30 +12,33 @@
     <Window.Resources>
         <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <helpers:BoolToTextConverter x:Key="BoolToTextConverter"/>
     </Window.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <!-- Top Black Bar -->
-        <Grid Background="Black" Height="80" VerticalAlignment="Top" Panel.ZIndex="1">
+        <Grid Background="Black" Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left: User Info -->
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
                 <Ellipse Width="40" Height="40" Fill="White" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding CurrentUserName}" Foreground="White" FontSize="16" VerticalAlignment="Center" Margin="10,0"/>
+                <TextBlock Text="{Binding CurrentUserName}" Foreground="White" FontSize="16" Margin="10,0" VerticalAlignment="Center"/>
                 <Button Content="Logout" Command="{Binding LogoutCommand}" Background="Transparent" Foreground="White" BorderThickness="0" Margin="10,0,0,0"/>
             </StackPanel>
 
-            <!-- Center: Logo -->
             <Image Grid.Column="1" Source="/Assets/Images/logo.png" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
-            <!-- Right: Menu Button -->
             <Button Grid.Column="2" Command="{Binding OpenAppMenuCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Padding="0">
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
                 <StackPanel Orientation="Vertical">
                     <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
                     <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
@@ -45,28 +48,149 @@
         </Grid>
 
         <!-- App Menu -->
-        <Border Background="#CC2E0854" CornerRadius="0,0,12,12" Padding="5" Height="180" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,80,20,0"
-                Visibility="{Binding IsAppMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                Panel.ZIndex="2">
+        <Border Background="#CC2E0854" CornerRadius="0,0,12,12" Padding="5" Height="180" HorizontalAlignment="Right"
+                VerticalAlignment="Top" Margin="0,80,20,0" Panel.ZIndex="2"
+                Visibility="{Binding IsAppMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}">
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="40">
-                <Button Content="MANAGE MENU" Command="{Binding ShowManageMenuCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
-                <Button Content="MANAGE ORDERS" Command="{Binding ShowManageOrdersCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="MANAGE MENU" Command="{Binding ShowManageMenuCommand}" Margin="8"/>
+                <Button Content="MANAGE ORDERS" Command="{Binding ShowManageOrdersCommand}" Margin="8"/>
             </StackPanel>
         </Border>
 
-        <!-- Admin Content Area -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0" Panel.ZIndex="0">
-            <Grid>
-                <Grid Visibility="{Binding IsManageMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Manage Menu Section" Foreground="White" FontSize="24" Margin="20"/>
-                    <!-- Add menu management content -->
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+            <StackPanel Margin="20,10,20,10">
+                <TextBlock Text="{Binding CurrentManagementTitle}" FontSize="20" FontWeight="Bold" Foreground="White"/>
+
+                <!-- Section Toggle Buttons -->
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,20">
+                    <Button Content="Dishes" Command="{Binding ShowDishesCommand}" Background="#FFE0B3" Foreground="Black" Width="100" Margin="5"/>
+                    <Button Content="Menus" Command="{Binding ShowMenusCommand}" Background="#FFE0B3" Foreground="Black" Width="100" Margin="5"/>
+                    <Button Content="Categories" Command="{Binding ShowCategoriesCommand}" Background="#FFE0B3" Foreground="Black" Width="100" Margin="5"/>
+                    <Button Content="Allergens" Command="{Binding ShowAllergensCommand}" Background="#FFE0B3" Foreground="Black" Width="100" Margin="5"/>
+                </StackPanel>
+
+                <!-- Dishes Table -->
+                <Grid Visibility="{Binding IsDishesVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <DataGrid ItemsSource="{Binding DishList}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="Price" Binding="{Binding Price}" />
+                                <DataGridTextColumn Header="Portion Size" Binding="{Binding PortionSize}" />
+                                <DataGridTextColumn Header="Total Quantity" Binding="{Binding TotalQuantity}" />
+                                <DataGridTemplateColumn Header="Actions">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Edit" Command="{Binding DataContext.EditDishCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="0,0,5,0"/>
+                                                <Button Content="Delete" Command="{Binding DataContext.DeleteDishCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Add New Dish -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox Width="150" Margin="5" Text="{Binding NewDish.Name, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Width="100" Margin="5" Text="{Binding NewDish.Price, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Width="100" Margin="5" Text="{Binding NewDish.PortionSize, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Width="100" Margin="5" Text="{Binding NewDish.TotalQuantity, UpdateSourceTrigger=PropertyChanged}" />
+                            <ComboBox Width="150" Margin="5" ItemsSource="{Binding CategoryList}" SelectedItem="{Binding SelectedCategoryForNewDish, Mode=TwoWay}" DisplayMemberPath="Name" />
+                            <Button Content="+" Width="40" Command="{Binding AddDishCommand}" />
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
 
-                <Grid Visibility="{Binding IsManageOrdersVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Manage Orders Section" Foreground="White" FontSize="24" Margin="20"/>
-                    <!-- Add order management content -->
+                <!-- Menus Table -->
+                <Grid Visibility="{Binding IsMenusVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <DataGrid ItemsSource="{Binding MenuList}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" />
+                                <DataGridTemplateColumn Header="Actions">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Edit" Command="{Binding DataContext.EditMenuCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="0,0,5,0"/>
+                                                <Button Content="Delete" Command="{Binding DataContext.DeleteMenuCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Add New Menu -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox Width="150" Margin="5" Text="{Binding NewMenu.Name, UpdateSourceTrigger=PropertyChanged}" />
+                            <ComboBox Width="150" Margin="5" ItemsSource="{Binding CategoryList}" SelectedItem="{Binding SelectedCategoryForNewMenu, Mode=TwoWay}" DisplayMemberPath="Name" />
+                            <Button Content="+" Width="40" Command="{Binding AddMenuCommand}" />
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
-            </Grid>
+
+                <!-- Categories Table -->
+                <Grid Visibility="{Binding IsCategoriesVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <DataGrid ItemsSource="{Binding CategoryList}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Category Name" Binding="{Binding Name}" />
+                                <DataGridTemplateColumn Header="Actions">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Edit" Command="{Binding DataContext.EditCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="0,0,5,0"/>
+                                                <Button Content="Delete" Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Add New Category -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox Width="200" Margin="5" Text="{Binding NewCategory.Name, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Content="+" Width="40" Command="{Binding AddCategoryCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Allergens Table -->
+                <Grid Visibility="{Binding IsAllergensVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <DataGrid ItemsSource="{Binding AllergenList}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Allergen Name" Binding="{Binding Name}" />
+                                <DataGridTemplateColumn Header="Actions">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Edit" Command="{Binding DataContext.EditAllergenCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="0,0,5,0"/>
+                                                <Button Content="Delete" Command="{Binding DataContext.DeleteAllergenCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Add New Allergen -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBox Width="200" Margin="5" Text="{Binding NewAllergen.Name, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Content="+" Width="40" Command="{Binding AddAllergenCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Placeholder for orders -->
+                <TextBlock Text="To be implemented." FontSize="18" Foreground="White" Margin="0,20,0,0"
+                           Visibility="{Binding IsManageOrdersVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Window>

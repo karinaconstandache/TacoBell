@@ -21,5 +21,12 @@ namespace TacoBell.Models.Entities
         public ICollection<DishImage> Images { get; set; }
         public ICollection<MenuDish> MenuDishes { get; set; }
         public ICollection<OrderDish> OrderDishes { get; set; }
+
+        [NotMapped]
+        public bool IsIncludedInMenu { get; set; }
+
+        [NotMapped]
+        public decimal DishQuantityInMenu { get; set; }
+
     }
 }

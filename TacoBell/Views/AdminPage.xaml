@@ -143,10 +143,25 @@
                         </DataGrid>
 
                         <!-- Add New Menu -->
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <TextBox Width="150" Margin="5" Text="{Binding NewMenu.Name, UpdateSourceTrigger=PropertyChanged}" />
-                            <ComboBox Width="150" Margin="5" ItemsSource="{Binding CategoryList}" SelectedItem="{Binding SelectedCategoryForNewMenu, Mode=TwoWay}" DisplayMemberPath="Name" />
-                            <Button Content="+" Width="40" Command="{Binding AddMenuCommand}" />
+                        <StackPanel Orientation="Vertical" Margin="0,20,0,10">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBox Width="150" Margin="5" Text="{Binding NewMenu.Name, UpdateSourceTrigger=PropertyChanged}" />
+                                <ComboBox Width="150" Margin="5" ItemsSource="{Binding CategoryList}" SelectedItem="{Binding SelectedCategoryForNewMenu, Mode=TwoWay}" DisplayMemberPath="Name" />
+                            </StackPanel>
+
+                            <TextBlock Text="Select Dishes for Menu" Foreground="White" FontWeight="Bold" Margin="5,0" />
+                            <ItemsControl ItemsSource="{Binding AvailableDishesForMenu}" Margin="5">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsIncludedInMenu, Mode=TwoWay}" Width="150" />
+                                            <TextBox Width="80" Margin="10,0" Text="{Binding DishQuantityInMenu, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Button Content="+" Width="40" Command="{Binding AddMenuCommand}" Margin="5" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>

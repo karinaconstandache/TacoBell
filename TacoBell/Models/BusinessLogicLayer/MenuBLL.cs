@@ -20,15 +20,30 @@ namespace TacoBell.Models.BusinessLogicLayer
                       }).ToList();
         }
 
-        public void AddMenu(Menu menu)
+        public Menu AddMenu(Menu menu)
         {
-            _db.Menus.Add(new Menu
+            var created = _db.Menus.Add(new Menu
             {
                 Name = menu.Name,
                 CategoryId = menu.CategoryId
+            }).Entity;
+
+            _db.SaveChanges();
+            return created;
+        }
+
+
+        public void AddDishToMenu(int menuId, int dishId, decimal quantity)
+        {
+            _db.MenuDishes.Add(new MenuDish
+            {
+                MenuId = menuId,
+                DishId = dishId,
+                DishQuantityInMenu = quantity
             });
             _db.SaveChanges();
         }
+
 
         public void UpdateMenu(Menu menu)
         {
@@ -46,9 +61,14 @@ namespace TacoBell.Models.BusinessLogicLayer
             var menu = _db.Menus.Find(id);
             if (menu != null)
             {
+                // Ștergem întâi toate legăturile cu preparate
+                var relatedDishes = _db.MenuDishes.Where(md => md.MenuId == id).ToList();
+                _db.MenuDishes.RemoveRange(relatedDishes);
+
                 _db.Menus.Remove(menu);
                 _db.SaveChanges();
             }
         }
+
     }
 }

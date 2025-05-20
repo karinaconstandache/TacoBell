@@ -53,6 +53,8 @@ namespace TacoBell.ViewModels
             NewAllergen = new Allergen();
 
             AvailableAllergens = new ObservableCollection<Allergen>(_allergenBLL.GetAllAllergens());
+            AvailableDishesForMenu = new ObservableCollection<Dish>(_dishBLL.GetAllDishes());
+
         }
 
         public string CurrentUserName => UserSessionService.CurrentUser?.FirstName ?? "";
@@ -120,6 +122,8 @@ namespace TacoBell.ViewModels
         public ObservableCollection<Category> CategoryList { get; set; } = new();
         public ObservableCollection<Allergen> AllergenList { get; set; } = new();
         public ObservableCollection<Allergen> AvailableAllergens { get; set; } = new();
+        public ObservableCollection<Dish> AvailableDishesForMenu { get; set; } = new();
+
         public List<string> AvailableImages { get; set; }
         public string SelectedImagePath { get; set; }
 
@@ -169,6 +173,7 @@ namespace TacoBell.ViewModels
                 OnPropertyChanged(nameof(SelectedCategoryForNewDish));
                 OnPropertyChanged(nameof(SelectedImagePath));
                 LoadDishes();
+                LoadAvailableDishesForMenu();
             }
         }
 
@@ -183,12 +188,26 @@ namespace TacoBell.ViewModels
             if (SelectedCategoryForNewMenu != null && !string.IsNullOrWhiteSpace(NewMenu.Name))
             {
                 NewMenu.CategoryId = SelectedCategoryForNewMenu.CategoryId;
-                _menuBLL.AddMenu(NewMenu);
+                var createdMenu = _menuBLL.AddMenu(NewMenu);
+
+                foreach (var dish in AvailableDishesForMenu.Where(d => d.IsIncludedInMenu && d.DishQuantityInMenu > 0))
+                {
+                    _menuBLL.AddDishToMenu(createdMenu.MenuId, dish.DishId, dish.DishQuantityInMenu);
+                }
+
                 NewMenu = new Menu();
                 SelectedCategoryForNewMenu = null;
+
+                foreach (var dish in AvailableDishesForMenu)
+                {
+                    dish.IsIncludedInMenu = false;
+                    dish.DishQuantityInMenu = 0;
+                }
+
                 OnPropertyChanged(nameof(NewMenu));
                 OnPropertyChanged(nameof(SelectedCategoryForNewMenu));
                 LoadMenus();
+                LoadAvailableDishesForMenu(); // <== refresh lista după adăugare preparat
             }
         }
 
@@ -284,6 +303,12 @@ namespace TacoBell.ViewModels
                 AvailableAllergens.Add(allergen);
             }
             OnPropertyChanged(nameof(AvailableAllergens));
+        }
+
+        private void LoadAvailableDishesForMenu()
+        {
+            AvailableDishesForMenu = new ObservableCollection<Dish>(_dishBLL.GetAllDishes());
+            OnPropertyChanged(nameof(AvailableDishesForMenu));
         }
 
         private void Logout()

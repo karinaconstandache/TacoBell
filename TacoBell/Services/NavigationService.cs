@@ -13,6 +13,7 @@ namespace TacoBell.Services
                 "LoginPage" => new LoginPage(),
                 "MenuPage" => new MenuPage(),
                 "AccountPage" => new AccountPage(),
+                "AdminPage" => new AdminPage(),
                 _ => null
             };
 

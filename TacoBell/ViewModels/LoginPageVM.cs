@@ -96,7 +96,11 @@ namespace TacoBell.ViewModels
                 }
 
                 UserSessionService.SetUser(user);
-                _navigationService.NavigateTo("HomePage");
+                if (user.Role == UserRole.ADMIN)
+                    _navigationService.NavigateTo("AdminPage");
+                else
+                    _navigationService.NavigateTo("HomePage");
+
             }
             else
             {

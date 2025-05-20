@@ -1,0 +1,72 @@
+﻿<Window x:Class="TacoBell.Views.AdminPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:helpers="clr-namespace:TacoBell.Helpers"
+        mc:Ignorable="d"
+        Title="AdminPage" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#5C2D73">
+
+    <Window.Resources>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <!-- Top Black Bar -->
+        <Grid Background="Black" Height="80" VerticalAlignment="Top" Panel.ZIndex="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: User Info -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                <Ellipse Width="40" Height="40" Fill="White" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding CurrentUserName}" Foreground="White" FontSize="16" VerticalAlignment="Center" Margin="10,0"/>
+                <Button Content="Logout" Command="{Binding LogoutCommand}" Background="Transparent" Foreground="White" BorderThickness="0" Margin="10,0,0,0"/>
+            </StackPanel>
+
+            <!-- Center: Logo -->
+            <Image Grid.Column="1" Source="/Assets/Images/logo.png" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+            <!-- Right: Menu Button -->
+            <Button Grid.Column="2" Command="{Binding OpenAppMenuCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Padding="0">
+                <StackPanel Orientation="Vertical">
+                    <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
+                    <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
+                    <Rectangle Height="4" Width="25" Fill="White" Margin="0,3"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- App Menu -->
+        <Border Background="#CC2E0854" CornerRadius="0,0,12,12" Padding="5" Height="180" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,80,20,0"
+                Visibility="{Binding IsAppMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                Panel.ZIndex="2">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="40">
+                <Button Content="MANAGE MENU" Command="{Binding ShowManageMenuCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+                <Button Content="MANAGE ORDERS" Command="{Binding ShowManageOrdersCommand}" Style="{StaticResource MenuButtonStyle}" Margin="8"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Admin Content Area -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0" Panel.ZIndex="0">
+            <Grid>
+                <Grid Visibility="{Binding IsManageMenuVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Manage Menu Section" Foreground="White" FontSize="24" Margin="20"/>
+                    <!-- Add menu management content -->
+                </Grid>
+
+                <Grid Visibility="{Binding IsManageOrdersVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Manage Orders Section" Foreground="White" FontSize="24" Margin="20"/>
+                    <!-- Add order management content -->
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>

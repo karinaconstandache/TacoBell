@@ -330,11 +330,11 @@ namespace TacoBell.ViewModels
 
         private void LoadAvailableImages()
         {
-            var imageDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Images");
+            var imageDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Images", "MenuImages");
             if (Directory.Exists(imageDir))
             {
                 AvailableImages = Directory.GetFiles(imageDir)
-                    .Select(p => Path.Combine("Assets", "Images", Path.GetFileName(p))).ToList();
+                    .Select(p => Path.Combine("Assets", "Images", "MenuImages", Path.GetFileName(p))).ToList();
             }
             else
             {

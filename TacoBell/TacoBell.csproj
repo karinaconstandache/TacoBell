@@ -15,6 +15,17 @@
     <None Remove="Assets\Images\locations.png" />
     <None Remove="Assets\Images\logo.png" />
     <None Remove="Assets\Images\menuimage.jpg" />
+    <None Remove="Assets\Images\MenuImages\burrito-creamy-jalapeno.jpg" />
+    <None Remove="Assets\Images\MenuImages\chalupa.jpg" />
+    <None Remove="Assets\Images\MenuImages\cheesy-bacon-fries-burrito.png" />
+    <None Remove="Assets\Images\MenuImages\crispy-chicken-taco-supreme.png" />
+    <None Remove="Assets\Images\MenuImages\crunchwrap-supreme.png" />
+    <None Remove="Assets\Images\MenuImages\crunchy-taco-supreme.png" />
+    <None Remove="Assets\Images\MenuImages\nacho-cheese.png" />
+    <None Remove="Assets\Images\MenuImages\naked-burrito-bowl.png" />
+    <None Remove="Assets\Images\MenuImages\naked-chicken-taco.jpg" />
+    <None Remove="Assets\Images\MenuImages\quesadilla-creamy-jalapeno.jpg" />
+    <None Remove="Assets\Images\MenuImages\sour-cream.png" />
     <None Remove="Assets\Images\nachos.jpg" />
     <None Remove="Assets\Images\soft-taco-supreme.png" />
     <None Remove="Assets\Images\tacotuesday.png" />
@@ -24,10 +35,28 @@
     <Content Include="Assets\Images\chickenachosad.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Images\fajita-burrito.png">
+    <Content Include="Assets\Images\MenuImages\burrito-creamy-jalapeno.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Images\fries.jpg">
+    <Content Include="Assets\Images\MenuImages\chalupa.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\cheesy-bacon-fries-burrito.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\crispy-chicken-taco-supreme.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\crunchwrap-supreme.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\crunchy-taco-supreme.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\fajita-burrito.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\fries.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Images\locations.png">
@@ -39,10 +68,25 @@
     <Content Include="Assets\Images\menuimage.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Images\nachos.jpg">
+    <Content Include="Assets\Images\MenuImages\nacho-cheese.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Images\soft-taco-supreme.png">
+    <Content Include="Assets\Images\MenuImages\nachos.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\naked-burrito-bowl.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\naked-chicken-taco.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\quesadilla-creamy-jalapeno.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\soft-taco-supreme.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Images\MenuImages\sour-cream.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Images\tacotuesday.png">

@@ -12,8 +12,6 @@ namespace TacoBell.ViewModels
     public class MenuPageVM : BaseViewModel
     {
         private readonly NavigationService _navigationService;
-
-        // === Partea de conținut meniu ===
         private readonly CategoryService _categoryService = new();
         private readonly ProductService _productService = new();
         private readonly MenuService _menuService = new();
@@ -21,17 +19,24 @@ namespace TacoBell.ViewModels
         public ObservableCollection<Category> Categories { get; set; } = new();
         public ObservableCollection<IDisplayItem> FilteredItems { get; set; } = new();
 
+        public CartViewModel CartVM { get; } = new();
+
         public ICommand SelectCategoryCommand { get; }
         public ICommand ShowAllergensCommand { get; }
         public ICommand AddToCartCommand { get; }
-        public ICommand ViewCartCommand { get; }
+        public ICommand ToggleCartCommand { get; }
 
-        // === Constructor ===
+        private bool _isCartVisible = false;
+        public bool IsCartVisible
+        {
+            get => _isCartVisible;
+            set { _isCartVisible = value; OnPropertyChanged(); }
+        }
+
         public MenuPageVM(NavigationService navigationService)
         {
             _navigationService = navigationService;
 
-            // Navigare
             NavigateToLoginCommand = new RelayCommand(_ => _navigationService.NavigateTo("LoginPage"));
             OpenAppMenuCommand = new RelayCommand(_ => IsAppMenuVisible = !IsAppMenuVisible);
             NavigateToHomeCommand = new RelayCommand(_ => _navigationService.NavigateTo("HomePage"));
@@ -39,16 +44,14 @@ namespace TacoBell.ViewModels
             NavigateToAccountCommand = new RelayCommand(_ => NavigateToAccount());
             LogoutCommand = new RelayCommand(_ => Logout());
 
-            // Funcționalitate meniu
             SelectCategoryCommand = new RelayCommand(OnCategorySelected);
             ShowAllergensCommand = new RelayCommand(OnShowAllergens);
             AddToCartCommand = new RelayCommand(AddToCart);
-            ViewCartCommand = new RelayCommand(_ => OpenCartWindow());
+            ToggleCartCommand = new RelayCommand(_ => IsCartVisible = !IsCartVisible);
 
             LoadCategories();
         }
 
-        // === Meniu funcțional ===
         private async void LoadCategories()
         {
             var categories = await _categoryService.GetAllAsync();
@@ -61,13 +64,11 @@ namespace TacoBell.ViewModels
             if (categoryObj is not Category category) return;
 
             FilteredItems.Clear();
-
             var products = await _productService.GetByCategoryIdAsync(category.CategoryId);
             var menus = await _menuService.GetByCategoryIdAsync(category.CategoryId);
 
             foreach (var p in products)
                 FilteredItems.Add(p);
-
             foreach (var m in menus)
                 FilteredItems.Add(m);
 
@@ -92,18 +93,11 @@ namespace TacoBell.ViewModels
             }
 
             if (parameter is ProductDisplayDTO product)
-                CartService.Instance.AddProduct(product);
+                CartVM.AddProduct(product);
             else if (parameter is MenuDisplayDTO menu)
-                CartService.Instance.AddMenu(menu);
+                CartVM.AddMenu(menu);
         }
 
-        private void OpenCartWindow()
-        {
-            var window = new CartWindow();
-            window.ShowDialog();
-        }
-
-        // === Navigare și UI bară sus ===
         private bool _isAppMenuVisible;
         public bool IsAppMenuVisible
         {

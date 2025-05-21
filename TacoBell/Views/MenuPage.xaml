@@ -16,7 +16,10 @@
         <helpers:BoolToTextConverter x:Key="BoolToTextConverter"/>
         <helpers:SwitchModeTextConverter x:Key="SwitchModeTextConverter"/>
         <helpers:ImagePathConverter x:Key="ImagePathConverter"/>
+        <DropShadowEffect x:Key="ShadowEffect" Color="Black" BlurRadius="10" ShadowDepth="4"/>
     </Window.Resources>
+
+
 
     <Grid>
         <!-- Top Black Bar -->
@@ -67,17 +70,93 @@
             </StackPanel>
         </Border>
 
+
         <!-- Scrollable Content -->
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0">
             <StackPanel Margin="20">
 
-                <Button Content="View cart 🛒"
-                    Width="120"
-                    Height="35"
-                    Margin="0,0,20,0"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Command="{Binding ViewCartCommand}"/>
+                <Border x:Name="CartPanel"
+                Width="340"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,0,20,0"
+                Panel.ZIndex="10"
+                Background="White"
+                BorderBrush="#B89685"
+                BorderThickness="2"
+                CornerRadius="15"
+                Padding="15"
+                Effect="{DynamicResource ShadowEffect}">
+
+                    <!-- Context pentru comenzi și date -->
+                    <Border.DataContext>
+                        <Binding Path="CartVM"/>
+                    </Border.DataContext>
+
+
+                    <!-- Conținutul coșului -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <DockPanel Grid.Row="0">
+                            <TextBlock Text="Coșul de cumpărături" FontSize="18" FontWeight="Bold" Foreground="#5C2D73" Margin="0,0,10,0"/>
+                            <Button Content="✕"
+                            Command="{Binding DataContext.ToggleCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Width="30" Height="30"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="Black"
+                            HorizontalAlignment="Right"/>
+                        </DockPanel>
+
+                        <!-- Produse + meniuri -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,10,0,10">
+                            <StackPanel>
+                                <ItemsControl ItemsSource="{Binding Products}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="5">
+                                                <TextBlock Text="{Binding Name}" Width="160"/>
+                                                <TextBlock Text="{Binding Price, StringFormat='{}{0:0.##} lei'}" Width="70"/>
+                                                <Button Content="X"
+                                        Command="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Border}}"
+                                        CommandParameter="{Binding}" Width="30"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <ItemsControl ItemsSource="{Binding Menus}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="5">
+                                                <TextBlock Text="{Binding Name}" Width="160"/>
+                                                <TextBlock Text="{Binding Price, StringFormat='{}{0:0.##} lei'}" Width="70"/>
+                                                <Button Content="X"
+                                        Command="{Binding DataContext.RemoveMenuCommand, RelativeSource={RelativeSource AncestorType=Border}}"
+                                        CommandParameter="{Binding}" Width="30"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Total + plasare -->
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                            <TextBlock Text="{Binding TotalText}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Button Content="Plasează comanda" Width="130" Command="{Binding PlaceOrderCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+
+
 
 
                 <!-- Categorii -->

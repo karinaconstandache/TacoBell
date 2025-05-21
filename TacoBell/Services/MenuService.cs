@@ -1,0 +1,53 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using TacoBell.Models;
+using TacoBell.Models.DTOs;
+
+namespace TacoBell.Services
+{
+    public class MenuService
+    {
+        public async Task<List<MenuDisplayDTO>> GetByCategoryIdAsync(int categoryId)
+        {
+            using var db = new TacoBellDbContext();
+
+            var menus = await db.Menus
+                .Include(m => m.MenuDishes)
+                    .ThenInclude(md => md.Dish)
+                        .ThenInclude(d => d.DishAllergens)
+                            .ThenInclude(da => da.Allergen)
+                .Where(m => m.CategoryId == categoryId)
+                .ToListAsync();
+
+            var dtoList = menus.Select(menu =>
+            {
+                var allDishes = menu.MenuDishes.Select(md => md.Dish).ToList();
+
+                var portions = menu.MenuDishes
+                    .Select(md => $"{md.Dish.Name}: {md.DishQuantityInMenu}g").ToList();
+
+                var allergens = allDishes
+                    .SelectMany(d => d.DishAllergens)
+                    .Select(da => da.Allergen.Name)
+                    .Distinct()
+                    .ToList();
+
+                var allAvailable = allDishes.All(d => d.TotalQuantity > 0);
+
+                return new MenuDisplayDTO
+                {
+                    Name = menu.Name,
+                    ItemPortions = portions,
+                    Price = allDishes.Sum(d => d.Price) * 0.9m, // reducere 10%
+                    IsAvailable = allAvailable,
+                    ImagePath = "/Assets/Images/menuimages.jpg",
+                    Allergens = allergens
+                };
+            }).ToList();
+
+            return dtoList;
+        }
+    }
+}

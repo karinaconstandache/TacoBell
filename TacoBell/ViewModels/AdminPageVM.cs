@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using TacoBell.Helpers;
 using TacoBell.Models.BusinessLogicLayer;
@@ -54,7 +55,6 @@ namespace TacoBell.ViewModels
 
             AvailableAllergens = new ObservableCollection<Allergen>(_allergenBLL.GetAllAllergens());
             AvailableDishesForMenu = new ObservableCollection<Dish>(_dishBLL.GetAllDishes());
-
         }
 
         public string CurrentUserName => UserSessionService.CurrentUser?.FirstName ?? "";
@@ -127,18 +127,92 @@ namespace TacoBell.ViewModels
         public List<string> AvailableImages { get; set; }
         public string SelectedImagePath { get; set; }
 
-        public ICommand EditDishCommand => new RelayCommand(d => { });
-        public ICommand DeleteDishCommand => new RelayCommand(d => { });
-
-        public ICommand EditCategoryCommand => new RelayCommand(c => { });
-        public ICommand DeleteCategoryCommand => new RelayCommand(c => { });
-
-        public ICommand EditAllergenCommand => new RelayCommand(a => { });
-        public ICommand DeleteAllergenCommand => new RelayCommand(a => { });
-
         public Dish NewDish { get; set; }
         public Category SelectedCategoryForNewDish { get; set; }
+        public Menu NewMenu { get; set; }
+        public Category SelectedCategoryForNewMenu { get; set; }
+        public Category NewCategory { get; set; }
+        public Allergen NewAllergen { get; set; }
+
         public ICommand AddDishCommand => new RelayCommand(_ => AddDish());
+        public ICommand AddMenuCommand => new RelayCommand(_ => AddMenu());
+        public ICommand AddCategoryCommand => new RelayCommand(_ => AddCategory());
+        public ICommand AddAllergenCommand => new RelayCommand(_ => AddAllergen());
+
+        public ICommand EditDishCommand => new RelayCommand(_ => { });
+        public ICommand EditMenuCommand => new RelayCommand(m => { });
+        public ICommand EditCategoryCommand => new RelayCommand(_ => { });
+        public ICommand EditAllergenCommand => new RelayCommand(_ => { });
+
+        public ICommand DeleteDishCommand => new RelayCommand(d =>
+        {
+            try
+            {
+                if (d is Dish dish)
+                {
+                    _dishBLL.DeleteDish(dish.DishId);
+                    LoadDishes();
+                    LoadMenus();
+                    LoadAvailableDishesForMenu();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        });
+
+        public ICommand DeleteMenuCommand => new RelayCommand(m =>
+        {
+            try
+            {
+                if (m is Menu menu)
+                {
+                    _menuBLL.DeleteMenu(menu.MenuId);
+                    LoadMenus();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        });
+
+        public ICommand DeleteCategoryCommand => new RelayCommand(c =>
+        {
+            try
+            {
+                if (c is Category category)
+                {
+                    _categoryBLL.DeleteCategory(category.CategoryId);
+                    LoadCategories();
+                    LoadDishes();
+                    LoadMenus();
+                    LoadAvailableDishesForMenu();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        });
+
+        public ICommand DeleteAllergenCommand => new RelayCommand(a =>
+        {
+            try
+            {
+                if (a is Allergen allergen)
+                {
+                    _allergenBLL.DeleteAllergen(allergen.AllergenId);
+                    LoadAllergens();
+                    RefreshAvailableAllergens();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        });
 
         private void AddDish()
         {
@@ -172,16 +246,11 @@ namespace TacoBell.ViewModels
                 OnPropertyChanged(nameof(NewDish));
                 OnPropertyChanged(nameof(SelectedCategoryForNewDish));
                 OnPropertyChanged(nameof(SelectedImagePath));
+
                 LoadDishes();
                 LoadAvailableDishesForMenu();
             }
         }
-
-        public Menu NewMenu { get; set; }
-        public Category SelectedCategoryForNewMenu { get; set; }
-        public ICommand AddMenuCommand => new RelayCommand(_ => AddMenu());
-        public ICommand EditMenuCommand => new RelayCommand(m => EditMenu((Menu)m));
-        public ICommand DeleteMenuCommand => new RelayCommand(m => DeleteMenu((Menu)m));
 
         private void AddMenu()
         {
@@ -206,28 +275,11 @@ namespace TacoBell.ViewModels
 
                 OnPropertyChanged(nameof(NewMenu));
                 OnPropertyChanged(nameof(SelectedCategoryForNewMenu));
+
                 LoadMenus();
-                LoadAvailableDishesForMenu(); // <== refresh lista după adăugare preparat
+                LoadAvailableDishesForMenu();
             }
         }
-
-        private void EditMenu(Menu menu)
-        {
-            if (!string.IsNullOrWhiteSpace(menu.Name) && menu.CategoryId > 0)
-            {
-                _menuBLL.UpdateMenu(menu);
-                LoadMenus();
-            }
-        }
-
-        private void DeleteMenu(Menu menu)
-        {
-            _menuBLL.DeleteMenu(menu.MenuId);
-            LoadMenus();
-        }
-
-        public Category NewCategory { get; set; }
-        public ICommand AddCategoryCommand => new RelayCommand(_ => AddCategory());
 
         private void AddCategory()
         {
@@ -240,9 +292,6 @@ namespace TacoBell.ViewModels
             }
         }
 
-        public Allergen NewAllergen { get; set; }
-        public ICommand AddAllergenCommand => new RelayCommand(_ => AddAllergen());
-
         private void AddAllergen()
         {
             if (!string.IsNullOrWhiteSpace(NewAllergen.Name))
@@ -251,10 +300,9 @@ namespace TacoBell.ViewModels
                 NewAllergen = new Allergen();
                 OnPropertyChanged(nameof(NewAllergen));
                 LoadAllergens();
-                RefreshAvailableAllergens(); // <== aici
+                RefreshAvailableAllergens();
             }
         }
-
 
         private void LoadDishes()
         {
@@ -307,7 +355,13 @@ namespace TacoBell.ViewModels
 
         private void LoadAvailableDishesForMenu()
         {
-            AvailableDishesForMenu = new ObservableCollection<Dish>(_dishBLL.GetAllDishes());
+            var dishes = _dishBLL.GetAllDishes();
+            foreach (var dish in dishes)
+            {
+                dish.IsIncludedInMenu = false;
+                dish.DishQuantityInMenu = 0;
+            }
+            AvailableDishesForMenu = new ObservableCollection<Dish>(dishes);
             OnPropertyChanged(nameof(AvailableDishesForMenu));
         }
 

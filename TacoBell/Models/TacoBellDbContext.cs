@@ -23,21 +23,23 @@ namespace TacoBell.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Many-to-Many for DishAllergen
+            // ======= DishAllergen: many-to-many =======
             modelBuilder.Entity<DishAllergen>()
                 .HasKey(da => new { da.DishId, da.AllergenId });
 
             modelBuilder.Entity<DishAllergen>()
                 .HasOne(da => da.Dish)
                 .WithMany(d => d.DishAllergens)
-                .HasForeignKey(da => da.DishId);
+                .HasForeignKey(da => da.DishId)
+                .OnDelete(DeleteBehavior.Cascade); // permite ștergere automată
 
             modelBuilder.Entity<DishAllergen>()
                 .HasOne(da => da.Allergen)
                 .WithMany(a => a.DishAllergens)
-                .HasForeignKey(da => da.AllergenId);
+                .HasForeignKey(da => da.AllergenId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Many-to-Many for MenuDish
+            // ======= MenuDish: many-to-many =======
             modelBuilder.Entity<MenuDish>()
                 .HasKey(md => new { md.MenuId, md.DishId });
 
@@ -45,7 +47,7 @@ namespace TacoBell.Models
                 .HasOne(md => md.Menu)
                 .WithMany(m => m.MenuDishes)
                 .HasForeignKey(md => md.MenuId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); // prevenim conflicte de cascade
 
             modelBuilder.Entity<MenuDish>()
                 .HasOne(md => md.Dish)
@@ -53,7 +55,28 @@ namespace TacoBell.Models
                 .HasForeignKey(md => md.DishId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Many-to-Many for OrderDish
+            // ======= DishImage: one-to-many =======
+            modelBuilder.Entity<DishImage>()
+                .HasOne(i => i.Dish)
+                .WithMany(d => d.Images)
+                .HasForeignKey(i => i.DishId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ======= Dish -> Category =======
+            modelBuilder.Entity<Dish>()
+                .HasOne(d => d.Category)
+                .WithMany(c => c.Dishes)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ======= Menu -> Category =======
+            modelBuilder.Entity<Menu>()
+                .HasOne(m => m.Category)
+                .WithMany(c => c.Menus)
+                .HasForeignKey(m => m.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ======= OrderDish: many-to-many =======
             modelBuilder.Entity<OrderDish>()
                 .HasKey(od => new { od.OrderId, od.DishId });
 
@@ -69,7 +92,7 @@ namespace TacoBell.Models
                 .HasForeignKey(od => od.DishId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Many-to-Many for OrderMenu
+            // ======= OrderMenu: many-to-many =======
             modelBuilder.Entity<OrderMenu>()
                 .HasKey(om => new { om.OrderId, om.MenuId });
 
@@ -85,6 +108,7 @@ namespace TacoBell.Models
                 .HasForeignKey(om => om.MenuId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ======= Decimal precision globally =======
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())
@@ -97,6 +121,8 @@ namespace TacoBell.Models
                 }
             }
         }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"Server=DESKTOP-VLQOTJD;Database=TacoBellDb;Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true");

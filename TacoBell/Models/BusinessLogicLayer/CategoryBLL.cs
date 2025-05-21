@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TacoBell.Models.Entities;
 
@@ -7,6 +8,8 @@ namespace TacoBell.Models.BusinessLogicLayer
     public class CategoryBLL
     {
         private readonly TacoBellDbContext _db = new();
+        private readonly DishBLL _dishBLL = new();
+        private readonly MenuBLL _menuBLL = new();
 
         public List<Category> GetAllCategories()
         {
@@ -29,14 +32,22 @@ namespace TacoBell.Models.BusinessLogicLayer
             }
         }
 
-        public void DeleteCategory(int id)
+        public void DeleteCategory(int categoryId)
         {
-            var category = _db.Categories.Find(id);
+            var category = _db.Categories.Find(categoryId);
             if (category != null)
             {
+                bool hasDishes = _db.Dishes.Any(d => d.CategoryId == categoryId);
+                bool hasMenus = _db.Menus.Any(m => m.CategoryId == categoryId);
+
+                if (hasDishes || hasMenus)
+                    throw new InvalidOperationException("Această categorie conține preparate sau meniuri și nu poate fi ștearsă.");
+
                 _db.Categories.Remove(category);
                 _db.SaveChanges();
             }
         }
+
+
     }
 }

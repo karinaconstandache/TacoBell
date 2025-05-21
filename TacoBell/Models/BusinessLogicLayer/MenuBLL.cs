@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TacoBell.Models.Entities;
 
@@ -61,7 +62,10 @@ namespace TacoBell.Models.BusinessLogicLayer
             var menu = _db.Menus.Find(id);
             if (menu != null)
             {
-                // Ștergem întâi toate legăturile cu preparate
+                bool inOrders = _db.OrderMenus.Any(om => om.MenuId == id);
+                if (inOrders)
+                    throw new InvalidOperationException("Acest meniu este inclus într-o comandă și nu poate fi șters.");
+
                 var relatedDishes = _db.MenuDishes.Where(md => md.MenuId == id).ToList();
                 _db.MenuDishes.RemoveRange(relatedDishes);
 
@@ -69,6 +73,7 @@ namespace TacoBell.Models.BusinessLogicLayer
                 _db.SaveChanges();
             }
         }
+
 
     }
 }

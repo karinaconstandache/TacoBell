@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TacoBell.Models.Entities;
 
@@ -29,14 +30,21 @@ namespace TacoBell.Models.BusinessLogicLayer
             }
         }
 
-        public void DeleteAllergen(int id)
+        public void DeleteAllergen(int allergenId)
         {
-            var allergen = _db.Allergens.Find(id);
+            var allergen = _db.Allergens.Find(allergenId);
             if (allergen != null)
             {
+                bool isUsed = _db.DishAllergens.Any(da => da.AllergenId == allergenId);
+                if (isUsed)
+                    throw new InvalidOperationException("Acest alergen este utilizat într-un preparat și nu poate fi șters.");
+
                 _db.Allergens.Remove(allergen);
                 _db.SaveChanges();
             }
         }
+
+
+
     }
 }

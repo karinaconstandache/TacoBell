@@ -5,7 +5,6 @@ using TacoBell.Helpers;
 using TacoBell.Models.Entities;
 using TacoBell.Services;
 using TacoBell.Models.DTOs;
-using TacoBell.Views;
 
 namespace TacoBell.ViewModels
 {
@@ -23,8 +22,6 @@ namespace TacoBell.ViewModels
 
         public ICommand SelectCategoryCommand { get; }
         public ICommand ShowAllergensCommand { get; }
-        public ICommand AddToCartCommand { get; }
-        public ICommand ViewCartCommand { get; }
 
         // === Constructor ===
         public MenuPageVM(NavigationService navigationService)
@@ -42,8 +39,6 @@ namespace TacoBell.ViewModels
             // Funcționalitate meniu
             SelectCategoryCommand = new RelayCommand(OnCategorySelected);
             ShowAllergensCommand = new RelayCommand(OnShowAllergens);
-            AddToCartCommand = new RelayCommand(AddToCart);
-            ViewCartCommand = new RelayCommand(_ => OpenCartWindow());
 
             LoadCategories();
         }
@@ -81,26 +76,6 @@ namespace TacoBell.ViewModels
                 string allergens = string.Join(", ", displayItem.Allergens);
                 MessageBox.Show(string.IsNullOrWhiteSpace(allergens) ? "Fără alergeni" : $"Alergeni: {allergens}", "Informații");
             }
-        }
-
-        private void AddToCart(object parameter)
-        {
-            if (!UserSessionService.IsUserLoggedIn)
-            {
-                _navigationService.NavigateTo("LoginPage");
-                return;
-            }
-
-            if (parameter is ProductDisplayDTO product)
-                CartService.Instance.AddProduct(product);
-            else if (parameter is MenuDisplayDTO menu)
-                CartService.Instance.AddMenu(menu);
-        }
-
-        private void OpenCartWindow()
-        {
-            var window = new CartWindow();
-            window.ShowDialog();
         }
 
         // === Navigare și UI bară sus ===

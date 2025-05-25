@@ -71,15 +71,6 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,80,0,0">
             <StackPanel Margin="20">
 
-                <Button Content="View cart 🛒"
-                    Width="120"
-                    Height="35"
-                    Margin="0,0,20,0"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Command="{Binding ViewCartCommand}"/>
-
-
                 <!-- Categorii -->
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,20">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -129,12 +120,9 @@
                                                 Style="{StaticResource RoundedActionButtonStyle}"
                                                 Command="{Binding DataContext.ShowAllergensCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
                                                 CommandParameter="{Binding}"/>
-                                        <Button Content="Adaugă"
+                                        <Button Content="Adaugă" 
                                                 Style="{StaticResource RoundedActionButtonStyle}"
-                                                Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
                                                 IsEnabled="{Binding IsAvailable}"/>
-
                                     </StackPanel>
                                 </StackPanel>
                             </Border>

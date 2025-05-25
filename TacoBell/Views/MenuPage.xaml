@@ -141,17 +141,45 @@
             </StackPanel>
         </ScrollViewer>
         <Border Background="WhiteSmoke"
-            BorderBrush="Black"
-            BorderThickness="2"
-            Padding="10"
-            CornerRadius="8"
-            Width="300"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Visibility="{Binding IsCartVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-            Margin="20">
-                <StackPanel>
-                    <TextBlock Text="Coșul de cumpărături" FontWeight="Bold" FontSize="18" Margin="0,0,0,10"/>
+        BorderBrush="Black"
+        BorderThickness="2"
+        Padding="10"
+        CornerRadius="8"
+        Width="320"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Visibility="{Binding IsCartVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+        Margin="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Title Bar with Close Button -->
+                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                    <TextBlock Text="Coșul de cumpărături"
+                       FontWeight="Bold"
+                       FontSize="18"
+                       VerticalAlignment="Center"
+                       Margin="5,0"
+                       DockPanel.Dock="Left" />
+
+                    <Button Content="X"
+                    Command="{Binding ToggleCartCommand}"
+                    Width="25"
+                    Height="25"
+                    FontWeight="Bold"
+                    Background="Transparent"
+                    Foreground="Black"
+                    BorderThickness="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    ToolTip="Închide coșul"/>
+                </DockPanel>
+
+                <!-- Rest of Cart -->
+                <StackPanel Grid.Row="1">
                     <ItemsControl ItemsSource="{Binding CartItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -188,23 +216,23 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                <Separator Margin="0,10"/>
-                <StackPanel Visibility="{Binding CartItems.Count, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Separator Margin="0,10"/>
-                    <TextBlock Text="{Binding Subtotal, StringFormat='Subtotal: {0:0.00} lei'}" />
-                    <TextBlock Text="{Binding ShippingFee, StringFormat='Transport: {0:0.00} lei'}" />
-                    <TextBlock Text="{Binding Discount, StringFormat='Reducere: {0:0.00} lei'}" />
-                    <TextBlock Text="{Binding Total, StringFormat='Total: {0:0.00} lei'}" FontWeight="Bold" />
-                </StackPanel>
+                    <StackPanel Visibility="{Binding CartItems.Count, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Separator Margin="0,10"/>
+                        <TextBlock Text="{Binding Subtotal, StringFormat='Subtotal: {0:0.00} lei'}" />
+                        <TextBlock Text="{Binding ShippingFee, StringFormat='Transport: {0:0.00} lei'}" />
+                        <TextBlock Text="{Binding Discount, StringFormat='Reducere: {0:0.00} lei'}" />
+                        <TextBlock Text="{Binding Total, StringFormat='Total: {0:0.00} lei'}" FontWeight="Bold" />
+                    </StackPanel>
 
-                <Button Content="Plasează Comanda"
+                    <Button Content="Plasează Comanda"
                     Command="{Binding PlaceOrderCommand}"
                     IsEnabled="{Binding CartItems.Count, Converter={StaticResource BoolToVisibilityConverter}}"
                     Style="{StaticResource RoundedActionButtonStyle}"
                     Margin="0,10,0,0"/>
-
-            </StackPanel>
+                </StackPanel>
+            </Grid>
         </Border>
+
 
 
     </Grid>

@@ -2,7 +2,7 @@
 
 namespace TacoBell.Models.DTOs
 {
-    public class ProductDisplayDTO : IDisplayItem
+    public class DishDisplayDTO : IDisplayItem
     {
         public string Name { get; set; }
         public string PortionSize { get; set; }  // string, conform entității tale

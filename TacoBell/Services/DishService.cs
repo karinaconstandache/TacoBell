@@ -7,18 +7,18 @@ using TacoBell.Models.DTOs;
 
 namespace TacoBell.Services
 {
-    public class ProductService
+    public class DishService
     {
-        public async Task<List<ProductDisplayDTO>> GetByCategoryIdAsync(int categoryId)
+        public async Task<List<DishDisplayDTO>> GetByCategoryIdAsync(int categoryId)
         {
             using var db = new TacoBellDbContext();
 
-            var products = await db.Dishes
+            var dishes = await db.Dishes
                 .Include(p => p.DishAllergens)
                     .ThenInclude(da => da.Allergen)
                 .Include(p => p.Images)  // <-- corect, nu DishImages
                 .Where(p => p.CategoryId == categoryId)
-                .Select(p => new ProductDisplayDTO
+                .Select(p => new DishDisplayDTO
                 {
                     Name = p.Name,
                     PortionSize = p.PortionSize,
@@ -30,7 +30,7 @@ namespace TacoBell.Services
                 })
                 .ToListAsync();
 
-            return products;
+            return dishes;
         }
     }
 }

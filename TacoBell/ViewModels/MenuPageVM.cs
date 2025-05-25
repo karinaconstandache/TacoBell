@@ -14,7 +14,7 @@ namespace TacoBell.ViewModels
 
         // === Partea de conținut meniu ===
         private readonly CategoryService _categoryService = new();
-        private readonly ProductService _productService = new();
+        private readonly DishService _dishService = new();
         private readonly MenuService _menuService = new();
 
         public ObservableCollection<Category> Categories { get; set; } = new();
@@ -57,11 +57,11 @@ namespace TacoBell.ViewModels
 
             FilteredItems.Clear();
 
-            var products = await _productService.GetByCategoryIdAsync(category.CategoryId);
+            var dishes = await _dishService.GetByCategoryIdAsync(category.CategoryId);
             var menus = await _menuService.GetByCategoryIdAsync(category.CategoryId);
 
-            foreach (var p in products)
-                FilteredItems.Add(p);
+            foreach (var d in dishes)
+                FilteredItems.Add(d);
 
             foreach (var m in menus)
                 FilteredItems.Add(m);

@@ -8,6 +8,7 @@ using TacoBell.Models.DTOs;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using TacoBell.Models.BusinessLogicLayer;
 
 namespace TacoBell.ViewModels
 {
@@ -75,8 +76,41 @@ namespace TacoBell.ViewModels
 
         private async Task OnPlaceOrder()
         {
-            // To be implemented in next step.
+            if (!UserSessionService.IsUserLoggedIn)
+            {
+                MessageBox.Show("Trebuie să fii autentificat pentru a plasa o comandă.", "Autentificare necesară");
+                return;
+            }
+
+            if (!CartItems.Any())
+            {
+                MessageBox.Show("Coșul este gol.");
+                return;
+            }
+
+            try
+            {
+                var userId = UserSessionService.CurrentUser.UserId;
+                var orderBLL = new OrderBLL();
+
+                await orderBLL.PlaceOrderAsync(userId, ShippingFee, Discount, CartItems.ToList());
+
+                MessageBox.Show("Comanda a fost plasată cu succes!", "Succes");
+                CartItems.Clear();
+                IsCartVisible = false;
+
+                OnPropertyChanged(nameof(CartItems));
+                OnPropertyChanged(nameof(Subtotal));
+                OnPropertyChanged(nameof(ShippingFee));
+                OnPropertyChanged(nameof(Discount));
+                OnPropertyChanged(nameof(Total));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Eroare la plasarea comenzii: {ex.Message}");
+            }
         }
+
 
         private async void LoadCategories()
         {

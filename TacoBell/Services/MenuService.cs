@@ -38,6 +38,7 @@ namespace TacoBell.Services
 
                 return new MenuDisplayDTO
                 {
+                    MenuId = menu.MenuId,
                     Name = menu.Name,
                     ItemPortions = portions,
                     Price = allDishes.Sum(d => d.Price) * 0.9m, // reducere 10%

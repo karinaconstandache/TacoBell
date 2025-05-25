@@ -4,11 +4,12 @@ namespace TacoBell.Models.DTOs
 {
     public class DishDisplayDTO : IDisplayItem
     {
+        public int DishId { get; set; }
         public string Name { get; set; }
-        public string PortionSize { get; set; }  // string, conform entității tale
+        public string PortionSize { get; set; }
         public decimal Price { get; set; }
         public decimal TotalQuantity { get; set; }
-        public string ImagePath { get; set; }    // folosește RelativePath de fapt
+        public string ImagePath { get; set; }
         public List<string> Allergens { get; set; } = new();
 
         public string PortionInfo => $"Portie: {PortionSize}";

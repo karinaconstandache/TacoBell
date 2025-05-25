@@ -5,30 +5,48 @@ using TacoBell.Helpers;
 using TacoBell.Models.Entities;
 using TacoBell.Services;
 using TacoBell.Models.DTOs;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace TacoBell.ViewModels
 {
     public class MenuPageVM : BaseViewModel
     {
         private readonly NavigationService _navigationService;
-
-        // === Partea de conținut meniu ===
         private readonly CategoryService _categoryService = new();
         private readonly DishService _dishService = new();
         private readonly MenuService _menuService = new();
 
         public ObservableCollection<Category> Categories { get; set; } = new();
         public ObservableCollection<IDisplayItem> FilteredItems { get; set; } = new();
+        public ObservableCollection<CartItem> CartItems { get; set; } = new();
+
+        private bool _isCartVisible;
+        public bool IsCartVisible
+        {
+            get => _isCartVisible;
+            set { _isCartVisible = value; OnPropertyChanged(); }
+        }
+
+        public decimal Subtotal => CartItems.Sum(c => c.TotalPrice);
+        public decimal ShippingFee => Subtotal < 50 ? 10 : 0;
+        public bool HasDiscount => Subtotal > 100;
+        public decimal Discount => HasDiscount ? Subtotal * 0.10m : 0;
+        public decimal Total => Subtotal + ShippingFee - Discount;
 
         public ICommand SelectCategoryCommand { get; }
         public ICommand ShowAllergensCommand { get; }
+        public ICommand AddToCartCommand { get; }
+        public ICommand ToggleCartCommand { get; }
+        public ICommand PlaceOrderCommand { get; }
+        public ICommand IncreaseQuantityCommand { get; }
+        public ICommand DecreaseQuantityCommand { get; }
 
-        // === Constructor ===
         public MenuPageVM(NavigationService navigationService)
         {
             _navigationService = navigationService;
 
-            // Navigare
             NavigateToLoginCommand = new RelayCommand(_ => _navigationService.NavigateTo("LoginPage"));
             OpenAppMenuCommand = new RelayCommand(_ => IsAppMenuVisible = !IsAppMenuVisible);
             NavigateToHomeCommand = new RelayCommand(_ => _navigationService.NavigateTo("HomePage"));
@@ -36,14 +54,30 @@ namespace TacoBell.ViewModels
             NavigateToAccountCommand = new RelayCommand(_ => NavigateToAccount());
             LogoutCommand = new RelayCommand(_ => Logout());
 
-            // Funcționalitate meniu
             SelectCategoryCommand = new RelayCommand(OnCategorySelected);
             ShowAllergensCommand = new RelayCommand(OnShowAllergens);
+            AddToCartCommand = new RelayCommand(OnAddToCart);
+            ToggleCartCommand = new RelayCommand(_ => IsCartVisible = !IsCartVisible);
+            PlaceOrderCommand = new RelayCommand(async _ => await OnPlaceOrder());
+            IncreaseQuantityCommand = new RelayCommand(OnIncreaseQuantity);
+            DecreaseQuantityCommand = new RelayCommand(OnDecreaseQuantity);
+
+            CartItems.CollectionChanged += (_, _) =>
+            {
+                OnPropertyChanged(nameof(Subtotal));
+                OnPropertyChanged(nameof(ShippingFee));
+                OnPropertyChanged(nameof(Discount));
+                OnPropertyChanged(nameof(Total));
+            };
 
             LoadCategories();
         }
 
-        // === Meniu funcțional ===
+        private async Task OnPlaceOrder()
+        {
+            // To be implemented in next step.
+        }
+
         private async void LoadCategories()
         {
             var categories = await _categoryService.GetAllAsync();
@@ -78,7 +112,79 @@ namespace TacoBell.ViewModels
             }
         }
 
-        // === Navigare și UI bară sus ===
+        private void OnAddToCart(object item)
+        {
+            if (!UserSessionService.IsUserLoggedIn)
+            {
+                MessageBox.Show("Trebuie să fii autentificat pentru a adăuga produse în coș.", "Autentificare necesară");
+                _navigationService.NavigateTo("LoginPage");
+                return;
+            }
+
+            if (item is DishDisplayDTO dish)
+            {
+                var existing = CartItems.FirstOrDefault(c => c.DishId == dish.DishId);
+                if (existing != null)
+                    existing.Quantity++;
+                else
+                    CartItems.Add(new CartItem
+                    {
+                        Name = dish.Name,
+                        DishId = dish.DishId,
+                        Price = dish.Price,
+                        Quantity = 1
+                    });
+            }
+            else if (item is MenuDisplayDTO menu)
+            {
+                var existing = CartItems.FirstOrDefault(c => c.MenuId == menu.MenuId);
+                if (existing != null)
+                    existing.Quantity++;
+                else
+                    CartItems.Add(new CartItem
+                    {
+                        Name = menu.Name,
+                        MenuId = menu.MenuId,
+                        Price = menu.Price,
+                        Quantity = 1
+                    });
+            }
+
+            OnPropertyChanged(nameof(CartItems));
+            OnPropertyChanged(nameof(Subtotal));
+            OnPropertyChanged(nameof(ShippingFee));
+            OnPropertyChanged(nameof(Discount));
+            OnPropertyChanged(nameof(Total));
+            MessageBox.Show("Produs adăugat în coș.", "Confirmare");
+        }
+
+        private void OnIncreaseQuantity(object param)
+        {
+            if (param is CartItem item)
+            {
+                item.Quantity++;
+                OnPropertyChanged(nameof(Subtotal));
+                OnPropertyChanged(nameof(ShippingFee));
+                OnPropertyChanged(nameof(Discount));
+                OnPropertyChanged(nameof(Total));
+            }
+        }
+
+        private void OnDecreaseQuantity(object param)
+        {
+            if (param is CartItem item)
+            {
+                item.Quantity--;
+                if (item.Quantity <= 0)
+                    CartItems.Remove(item);
+
+                OnPropertyChanged(nameof(Subtotal));
+                OnPropertyChanged(nameof(ShippingFee));
+                OnPropertyChanged(nameof(Discount));
+                OnPropertyChanged(nameof(Total));
+            }
+        }
+
         private bool _isAppMenuVisible;
         public bool IsAppMenuVisible
         {

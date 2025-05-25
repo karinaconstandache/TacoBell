@@ -14,19 +14,20 @@ namespace TacoBell.Services
             using var db = new TacoBellDbContext();
 
             var dishes = await db.Dishes
-                .Include(p => p.DishAllergens)
+                .Include(d => d.DishAllergens)
                     .ThenInclude(da => da.Allergen)
-                .Include(p => p.Images)  // <-- corect, nu DishImages
-                .Where(p => p.CategoryId == categoryId)
-                .Select(p => new DishDisplayDTO
+                .Include(d => d.Images)  // <-- corect, nu DishImages
+                .Where(d => d.CategoryId == categoryId)
+                .Select(d => new DishDisplayDTO
                 {
-                    Name = p.Name,
-                    PortionSize = p.PortionSize,
-                    Price = p.Price,
-                    TotalQuantity = p.TotalQuantity,
-                    ImagePath = p.Images.Select(img => img.RelativePath).FirstOrDefault()
+                    DishId = d.DishId,
+                    Name = d.Name,
+                    PortionSize = d.PortionSize,
+                    Price = d.Price,
+                    TotalQuantity = d.TotalQuantity,
+                    ImagePath = d.Images.Select(img => img.RelativePath).FirstOrDefault()
                                 ?? "/Assets/Images/menuimage.jpg",
-                    Allergens = p.DishAllergens.Select(da => da.Allergen.Name).ToList()
+                    Allergens = d.DishAllergens.Select(da => da.Allergen.Name).ToList()
                 })
                 .ToListAsync();
 

@@ -4,6 +4,7 @@ namespace TacoBell.Models.DTOs
 {
     public class MenuDisplayDTO : IDisplayItem
     {
+        public int MenuId { get; set; }
         public string Name { get; set; }
         public List<string> ItemPortions { get; set; } = new();
         public decimal Price { get; set; }
@@ -15,4 +16,5 @@ namespace TacoBell.Models.DTOs
         public string PriceInfo => $"Pret: {Price} lei";
         public string Availability => IsAvailable ? "" : "Indisponibil";
     }
+
 }

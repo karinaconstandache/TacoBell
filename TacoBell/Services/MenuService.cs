@@ -34,7 +34,8 @@ namespace TacoBell.Services
                     .Distinct()
                     .ToList();
 
-                var allAvailable = allDishes.All(d => d.TotalQuantity > 0);
+                var allAvailable = menu.MenuDishes.All(md =>
+                    md.Dish.TotalQuantity >= md.DishQuantityInMenu);
 
                 return new MenuDisplayDTO
                 {

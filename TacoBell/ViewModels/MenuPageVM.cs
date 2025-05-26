@@ -21,6 +21,7 @@ namespace TacoBell.ViewModels
 
         public ObservableCollection<Category> Categories { get; set; } = new();
         public ObservableCollection<IDisplayItem> FilteredItems { get; set; } = new();
+        public ObservableCollection<IDisplayItem> AllItems { get; set; } = new(); // Store all items for search
         public ObservableCollection<CartItem> CartItems { get; set; } = new();
 
         private bool _isCartVisible;
@@ -28,6 +29,74 @@ namespace TacoBell.ViewModels
         {
             get => _isCartVisible;
             set { _isCartVisible = value; OnPropertyChanged(); }
+        }
+
+        // Search properties
+        private string _searchKeyword = "";
+        public string SearchKeyword
+        {
+            get => _searchKeyword;
+            set
+            {
+                _searchKeyword = value;
+                OnPropertyChanged();
+                PerformSearch();
+            }
+        }
+
+        private bool _searchByName = true;
+        public bool SearchByName
+        {
+            get => _searchByName;
+            set
+            {
+                _searchByName = value;
+                OnPropertyChanged();
+                PerformSearch();
+            }
+        }
+
+        private bool _searchByAllergen = false;
+        public bool SearchByAllergen
+        {
+            get => _searchByAllergen;
+            set
+            {
+                _searchByAllergen = value;
+                OnPropertyChanged();
+                PerformSearch();
+            }
+        }
+
+        private bool _allergenContains = true;
+        public bool AllergenContains
+        {
+            get => _allergenContains;
+            set
+            {
+                _allergenContains = value;
+                OnPropertyChanged();
+                PerformSearch();
+            }
+        }
+
+        private bool _allergenDoesNotContain = false;
+        public bool AllergenDoesNotContain
+        {
+            get => _allergenDoesNotContain;
+            set
+            {
+                _allergenDoesNotContain = value;
+                OnPropertyChanged();
+                PerformSearch();
+            }
+        }
+
+        private bool _isSearchMode = false;
+        public bool IsSearchMode
+        {
+            get => _isSearchMode;
+            set { _isSearchMode = value; OnPropertyChanged(); }
         }
 
         public decimal Subtotal => CartItems.Sum(c => c.TotalPrice);
@@ -43,6 +112,7 @@ namespace TacoBell.ViewModels
         public ICommand PlaceOrderCommand { get; }
         public ICommand IncreaseQuantityCommand { get; }
         public ICommand DecreaseQuantityCommand { get; }
+        public ICommand ClearSearchCommand { get; }
 
         public MenuPageVM(NavigationService navigationService)
         {
@@ -62,6 +132,7 @@ namespace TacoBell.ViewModels
             PlaceOrderCommand = new RelayCommand(async _ => await OnPlaceOrder());
             IncreaseQuantityCommand = new RelayCommand(OnIncreaseQuantity);
             DecreaseQuantityCommand = new RelayCommand(OnDecreaseQuantity);
+            ClearSearchCommand = new RelayCommand(_ => ClearSearch());
 
             CartItems.CollectionChanged += (_, _) =>
             {
@@ -111,17 +182,45 @@ namespace TacoBell.ViewModels
             }
         }
 
-
         private async void LoadCategories()
         {
             var categories = await _categoryService.GetAllAsync();
             Categories = new ObservableCollection<Category>(categories);
             OnPropertyChanged(nameof(Categories));
+
+            // Load all items initially
+            await LoadAllItems();
+        }
+
+        private async Task LoadAllItems()
+        {
+            AllItems.Clear();
+
+            foreach (var category in Categories)
+            {
+                var dishes = await _dishService.GetByCategoryIdAsync(category.CategoryId);
+                var menus = await _menuService.GetByCategoryIdAsync(category.CategoryId);
+
+                foreach (var d in dishes)
+                    AllItems.Add(d);
+
+                foreach (var m in menus)
+                    AllItems.Add(m);
+            }
+
+            if (!IsSearchMode)
+            {
+                FilteredItems = new ObservableCollection<IDisplayItem>(AllItems);
+                OnPropertyChanged(nameof(FilteredItems));
+            }
         }
 
         private async void OnCategorySelected(object categoryObj)
         {
             if (categoryObj is not Category category) return;
+
+            // Clear search mode when selecting a category
+            ClearSearch();
 
             FilteredItems.Clear();
 
@@ -134,6 +233,66 @@ namespace TacoBell.ViewModels
             foreach (var m in menus)
                 FilteredItems.Add(m);
 
+            OnPropertyChanged(nameof(FilteredItems));
+        }
+
+        private void PerformSearch()
+        {
+            if (string.IsNullOrWhiteSpace(SearchKeyword))
+            {
+                if (IsSearchMode)
+                {
+                    ClearSearch();
+                }
+                return;
+            }
+
+            IsSearchMode = true;
+            var searchResults = new ObservableCollection<IDisplayItem>();
+
+            if (SearchByName)
+            {
+                // Search by name (case insensitive)
+                var nameResults = AllItems.Where(item =>
+                    item.Name.ToLower().Contains(SearchKeyword.ToLower())).ToList();
+
+                foreach (var item in nameResults)
+                    searchResults.Add(item);
+            }
+            else if (SearchByAllergen)
+            {
+                // Search by allergen
+                if (AllergenContains)
+                {
+                    // Items that contain the allergen
+                    var allergenResults = AllItems.Where(item =>
+                        item.Allergens.Any(allergen =>
+                            allergen.ToLower().Contains(SearchKeyword.ToLower()))).ToList();
+
+                    foreach (var item in allergenResults)
+                        searchResults.Add(item);
+                }
+                else if (AllergenDoesNotContain)
+                {
+                    // Items that do NOT contain the allergen
+                    var allergenResults = AllItems.Where(item =>
+                        !item.Allergens.Any(allergen =>
+                            allergen.ToLower().Contains(SearchKeyword.ToLower()))).ToList();
+
+                    foreach (var item in allergenResults)
+                        searchResults.Add(item);
+                }
+            }
+
+            FilteredItems = searchResults;
+            OnPropertyChanged(nameof(FilteredItems));
+        }
+
+        private void ClearSearch()
+        {
+            IsSearchMode = false;
+            SearchKeyword = "";
+            FilteredItems = new ObservableCollection<IDisplayItem>(AllItems);
             OnPropertyChanged(nameof(FilteredItems));
         }
 

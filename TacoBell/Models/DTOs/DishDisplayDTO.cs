@@ -12,8 +12,8 @@ namespace TacoBell.Models.DTOs
         public string ImagePath { get; set; }
         public List<string> Allergens { get; set; } = new();
 
-        public string PortionInfo => $"Portie: {PortionSize}";
-        public string PriceInfo => $"Pret: {Price} lei";
+        public string PortionInfo => $"Portie: {PortionSize} g";
+        public string PriceInfo => $"Pret: {Price:0.00} lei";
         public bool IsAvailable => TotalQuantity > 0;
         public string Availability => IsAvailable ? "" : "Indisponibil";
     }

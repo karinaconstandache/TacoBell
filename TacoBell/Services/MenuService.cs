@@ -26,7 +26,7 @@ namespace TacoBell.Services
                 var allDishes = menu.MenuDishes.Select(md => md.Dish).ToList();
 
                 var portions = menu.MenuDishes
-                    .Select(md => $"{md.Dish.Name}: {md.DishQuantityInMenu}g").ToList();
+                    .Select(md => $"{md.Dish.Name}: {md.DishQuantityInMenu:0.##} buc").ToList();
 
                 var allergens = allDishes
                     .SelectMany(d => d.DishAllergens)
@@ -34,6 +34,7 @@ namespace TacoBell.Services
                     .Distinct()
                     .ToList();
 
+                // Check if menu is available based on dish quantities and required amounts
                 var allAvailable = menu.MenuDishes.All(md =>
                     md.Dish.TotalQuantity >= md.DishQuantityInMenu);
 

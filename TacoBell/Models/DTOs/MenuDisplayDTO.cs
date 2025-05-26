@@ -13,8 +13,7 @@ namespace TacoBell.Models.DTOs
         public List<string> Allergens { get; set; } = new();
 
         public string PortionInfo => string.Join(", ", ItemPortions);
-        public string PriceInfo => $"Pret: {Price} lei";
+        public string PriceInfo => $"Pret: {Price:0.00} lei";
         public string Availability => IsAvailable ? "" : "Indisponibil";
     }
-
 }
